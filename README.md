@@ -1,5 +1,6 @@
 # ha-smart0183
 Smart Boat 0183 Network Integration
+![Alt text for your image](.github/Thumbnail DIY Smart.png)
 I'm Rob, a seasoned sailor and tech enthusiast dedicated to revolutionizing the boating industry through the integration of accessible technology. With over 20 years of global sailing experience and a Computer Science degree, I am committed to providing you with practical innovations and ideas that will transform your boating experience.At Smart Boat Innovations, we explore the world of boat automation and harness the power of the Internet of Things (IoT) technology.
 
 My philosophy revolves around utilizing free open systems and affordable sensors and equipment. I believe that everyone should have access to these advancements without breaking the bank. While our website https://www.smartboatinnovations.com/ provides valuable insights and information, the majority of our content can be found on our YouTube channel. https://www.youtube.com/@SmartBoatInnovations
