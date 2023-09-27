@@ -1,0 +1,9 @@
+{
+  "domain": "smart0183",
+  "name": "Smart Boat 0183 Network Integration",
+  "documentation": "https://www.smartboatinnovations.com/",
+  "dependencies": [],
+  "integration_type": "hub",
+  "requirements": [],
+  "version": "0.1"
+}
