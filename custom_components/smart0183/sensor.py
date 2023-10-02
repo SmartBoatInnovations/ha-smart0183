@@ -297,11 +297,11 @@ class SerialSensor(SensorEntity):
             fields = line.split(',')
             sentence_id = fields[0][1:6]  # Gets the 5-char word after the $
 
-            # _LOGGER.debug(f"Checking sensor: {sentence_id}")
+            _LOGGER.debug(f"Checking sensor: {sentence_id}")
 
             # Check if main sensor exists; if not, create one
             if sentence_id not in self.hass.data["created_sensors"]:
-                # _LOGGER.debug(f"Creating main sensor: {sentence_id}")
+                _LOGGER.debug(f"Creating main sensor: {sentence_id}")
                 sensor = SmartSensor(sentence_id, line)
 
                 self.hass.data["add_serial_sensors"]([sensor])
@@ -320,11 +320,11 @@ class SerialSensor(SensorEntity):
 
                 sensor_name = f"{sentence_id}_{idx}"
 
-                # _LOGGER.debug(f"Checking field sensor: {sensor_name}")
+                _LOGGER.debug(f"Checking field sensor: {sensor_name}")
 
                 # Check if this field sensor exists; if not, create one
                 if sensor_name not in self.hass.data["created_sensors"]:
-                    # _LOGGER.debug(f"Creating field sensor: {sensor_name}")
+                    _LOGGER.debug(f"Creating field sensor: {sensor_name}")
                     sensor = SmartSensor(sensor_name, field_data)
                     self.hass.data["add_serial_sensors"]([sensor])
                     self.hass.data["created_sensors"][sensor_name] = sensor
