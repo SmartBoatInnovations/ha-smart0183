@@ -3,7 +3,10 @@ import logging
 import serial_asyncio
 import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
+import json
+import os
 
+from homeassistant.helpers.entity import Entity
 from serial import SerialException
 from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
 from homeassistant.const import CONF_NAME, CONF_VALUE_TEMPLATE, EVENT_HOMEASSISTANT_STOP
@@ -17,6 +20,7 @@ from datetime import datetime, timedelta
 # Setting up logging and configuring constants and default values
 
 _LOGGER = logging.getLogger(__name__)
+
 
 CONF_SERIAL_PORT = "serial_port"
 CONF_BAUDRATE = "baudrate"
@@ -119,6 +123,27 @@ async def async_setup_platform(
     # Initialize a dictionary to store references to the created sensors
     hass.data["created_sensors"] = {}
 
+    
+    # Load the 0183 data within setup_platform
+    config_dir = hass.config.config_dir
+    json_path = os.path.join(config_dir, 'custom_components', 'smart0183', 'Smart0183.json')
+    try:
+        with open(json_path, "r") as file:
+            smart_data = json.load(file)
+        
+        result_dict = {}
+        for sentence in smart_data:
+            for field in sentence["fields"]:
+                result_dict[field["unique_id"]] = field["short_description"]
+
+        hass.data["smart0183_data"] = result_dict
+
+    except Exception as e:
+        _LOGGER.error(f"Error loading Smart0183.json: {e}")
+        return
+
+    _LOGGER.debug(f"Loaded smart data: {hass.data['smart0183_data']}")
+
 
     sensor = SerialSensor(
         name,
@@ -142,16 +167,16 @@ async def async_setup_platform(
 # SmartSensor class representing a basic sensor entity with state
 
 class SmartSensor(Entity):
-    def __init__(self, name, initial_state):
+    def __init__(self, name, friendly_name, initial_state):
         """Initialize the sensor."""
         _LOGGER.info(f"Initializing sensor: {name} with state: {initial_state}")
-        self._name = name
-        self._unique_id = name
+        self._unique_id = name.lower().replace(" ", "_")
+        self._name = friendly_name if friendly_name else self._unique_id
         self._state = initial_state
         self._last_updated = datetime.now()
         if initial_state is None or initial_state == "":
             self._available = False
-            _LOGGER.info(f"Setting sensor: '{self._name}' with unavailable")
+            _LOGGER.debug(f"Setting sensor: '{self._name}' with unavailable")
         else:
             self._available = True
 
@@ -293,8 +318,6 @@ class SerialSensor(SensorEntity):
                 _LOGGER.error(f"Malformed line: {line}")
                 return
 
-            # Splitting by comma and getting the data fields
-            fields = line.split(',')
             sentence_id = fields[0][1:6]  # Gets the 5-char word after the $
 
             _LOGGER.debug(f"Checking sensor: {sentence_id}")
@@ -302,7 +325,7 @@ class SerialSensor(SensorEntity):
             # Check if main sensor exists; if not, create one
             if sentence_id not in self.hass.data["created_sensors"]:
                 _LOGGER.debug(f"Creating main sensor: {sentence_id}")
-                sensor = SmartSensor(sentence_id, line)
+                sensor = SmartSensor(sentence_id, sentence_id, line)
 
                 self.hass.data["add_serial_sensors"]([sensor])
                 self.hass.data["created_sensors"][sentence_id] = sensor
@@ -322,15 +345,25 @@ class SerialSensor(SensorEntity):
 
                 _LOGGER.debug(f"Checking field sensor: {sensor_name}")
 
+                short_sensor_name = f"{sentence_id[2:]}_{idx}"
+
                 # Check if this field sensor exists; if not, create one
                 if sensor_name not in self.hass.data["created_sensors"]:
                     _LOGGER.debug(f"Creating field sensor: {sensor_name}")
-                    sensor = SmartSensor(sensor_name, field_data)
+                    
+                    short_desc = self.hass.data["smart0183_data"].get(short_sensor_name, sensor_name)
+                    _LOGGER.info(f"Short descr sensor: {short_sensor_name} with : {short_desc}")
+
+                    sensor = SmartSensor(sensor_name, short_desc, field_data)
                     self.hass.data["add_serial_sensors"]([sensor])
                     self.hass.data["created_sensors"][sensor_name] = sensor
                 else:
                     # If the sensor already exists, update its state
                     _LOGGER.debug(f"Updating field sensor: {sensor_name}")
+
+                    short_desc = self.hass.data["smart0183_data"].get(short_sensor_name, sensor_name)
+                    _LOGGER.info(f"Short descr sensor: {short_sensor_name} with : {short_desc}")
+
                     sensor = self.hass.data["created_sensors"][sensor_name]
                     sensor.set_state(field_data)
 
