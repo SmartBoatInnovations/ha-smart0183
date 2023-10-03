@@ -352,7 +352,7 @@ class SerialSensor(SensorEntity):
                     _LOGGER.debug(f"Creating field sensor: {sensor_name}")
                     
                     short_desc = self.hass.data["smart0183_data"].get(short_sensor_name, sensor_name)
-                    _LOGGER.info(f"Short descr sensor: {short_sensor_name} with : {short_desc}")
+                    _LOGGER.debug(f"Short descr sensor: {short_sensor_name} with : {short_desc}")
 
                     sensor = SmartSensor(sensor_name, short_desc, field_data)
                     self.hass.data["add_serial_sensors"]([sensor])
@@ -362,7 +362,7 @@ class SerialSensor(SensorEntity):
                     _LOGGER.debug(f"Updating field sensor: {sensor_name}")
 
                     short_desc = self.hass.data["smart0183_data"].get(short_sensor_name, sensor_name)
-                    _LOGGER.info(f"Short descr sensor: {short_sensor_name} with : {short_desc}")
+                    _LOGGER.debug(f"Short descr sensor: {short_sensor_name} with : {short_desc}")
 
                     sensor = self.hass.data["created_sensors"][sensor_name]
                     sensor.set_state(field_data)
