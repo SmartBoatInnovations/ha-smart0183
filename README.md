@@ -10,3 +10,4 @@ My philosophy revolves around utilizing free open systems and affordable sensors
 I invite you to head over there, subscribe to our channel, and join the vibrant community of boating enthusiasts who are exploring the exciting possibilities of affordable technology.
 
 For instructions on using this ha-smart0183 integration go to https://www.smartboatinnovations.com/smart0183
+or watch this video guide: https://youtu.be/9mlTKtD1FFI
