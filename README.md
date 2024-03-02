@@ -1,6 +1,6 @@
 # ha-smart0183
 
-## Smart Boat 0183 Network Integration
+## Smart Boat 0183 Serial Integration
 
 ![Alt text for your image](.github/smart0183.png)
 
